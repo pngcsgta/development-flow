@@ -1,9 +1,9 @@
 # development-flow
 
-##Content
+## Content
 + [Makefile](#Makefile)
 
-###Makefile
+### Makefile
 This file contains useful commands you can use to easyly work with NodeJs/Javascript code (installl, build, test....) using docker containers.
 Steps:
 + Navigate to the your local folder where the project is
