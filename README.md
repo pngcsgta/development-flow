@@ -2,6 +2,7 @@
 
 ## Content
 + [Makefile](#Makefile)
+    + Requirements 
 
 ### Makefile
 This file contains useful commands you can use to easyly work with NodeJs/Javascript code (installl, build, test....) using docker containers.
@@ -21,3 +22,8 @@ Steps:
 	+ **make test-integration**: Launch integration tests
 	+ **make test-functional**: Launch functional tests (gherkin)
 	+ **make interactive**: Crate a container and start it interactively to allow you execute commands inside (install a dependency, install an app...)
+
+#### Requirements
++ Dockers intalled
++ Docker compose installed
++ Certificates installed
