@@ -54,47 +54,47 @@ clean-environment :
 # Instalar dependencias
 .PHONY: install
 install: clean-environment permissions
-	@docker run --rm --name install-${NAME}-${VERSION} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
+	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
 	@$(MAKE) permissions
 
 # Build
 .PHONY: build
 build:
-	@docker run --rm --name install-${NAME}-${VERSION} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD}'
+	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD}'
 
 # Build dev
 .PHONY: build-dev
 build-dev:
-	@docker run --rm --name install-${NAME}-${VERSION} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD_DEV}'
+	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD_DEV}'
 
 # Launch test
 .PHONY: test
 test: start-up
-	@docker exec container-${NAME}-${VERSION} /bin/bash -c '${CMD_TEST}'
+	@docker exec container-${NAME_VARIABLE}-${VERSION_VARIABLE} /bin/bash -c '${CMD_TEST}'
 	@$(MAKE) destroy
 
 # Launch tdd
 .PHONY: tdd
 tdd: start-up
-	@docker exec container-${NAME}-${VERSION} /bin/bash -c '${CMD_TDD}'
+	@docker exec container-${NAME_VARIABLE}-${VERSION_VARIABLE} /bin/bash -c '${CMD_TDD}'
 	@$(MAKE) destroy
 
 # Launch test-unit
 .PHONY: test-unit
 test-unit: start-up
-	@docker exec container-${NAME}-${VERSION} /bin/bash -c '${CMD_TEST_UNIT}'
+	@docker exec container-${NAME_VARIABLE}-${VERSION_VARIABLE} /bin/bash -c '${CMD_TEST_UNIT}'
 	@$(MAKE) destroy
 
 # Launch test-integration
 .PHONY: test-integration
 test-integration: start-up
-	@docker exec container-${NAME}-${VERSION} /bin/bash -c '${CMD_TEST_INTEGRATION}'
+	@docker exec container-${NAME_VARIABLE}-${VERSION_VARIABLE} /bin/bash -c '${CMD_TEST_INTEGRATION}'
 	@$(MAKE) destroy
 
 # Launch test-functional
 .PHONY: test-functional
 test-functional: start-up
-	@docker exec container-${NAME}-${VERSION} /bin/bash -c '${CMD_TEST_FUNCTIONAL}'
+	@docker exec container-${NAME_VARIABLE}-${VERSION_VARIABLE} /bin/bash -c '${CMD_TEST_FUNCTIONAL}'
 	@$(MAKE) destroy
 
 #####################
@@ -104,7 +104,7 @@ test-functional: start-up
 # Contenedor interactivo
 .PHONY: interactive
 interactive:
-	@docker run --rm --name interactive-${NAME}-${VERSION} -v ${FOLDER}:/root/project -i -t ${IMAGE} /bin/bash
+	@docker run --rm --name interactive-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project -i -t ${IMAGE} /bin/bash
 
 # Construir el entorno
 .PHONY: start-up
