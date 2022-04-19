@@ -53,7 +53,7 @@ clean-environment :
 
 # Instalar dependencias en integracion continua
 .PHONY: install-ci
-install:
+install-ci:
 	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
 
 # Instalar dependencias
