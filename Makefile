@@ -51,6 +51,11 @@ clean-environment :
 ### Reglas NPM ###
 ##################
 
+# Instalar dependencias en integracion continua
+.PHONY: install-ci
+install:
+	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
+
 # Instalar dependencias
 .PHONY: install
 install: clean-environment permissions
