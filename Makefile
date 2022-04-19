@@ -54,6 +54,8 @@ clean-environment :
 # Instalar dependencias en integracion continua
 .PHONY: install-ci
 install-ci:
+	@chown -fR root ${FOLDER}
+	@chmod -fR 777 ${FOLDER}
 	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
 
 # Instalar dependencias
