@@ -14,7 +14,6 @@ IMAGE_REPO           := ngcs-dev-tools01.arsysdesarrollo.lan:5000
 IMAGE_VERSION        := latest
 IMAGE                := ${IMAGE_REPO}/gta-ci:${IMAGE_VERSION}
 
-
 .PHONY: check
 check:
 ifeq ($(wildcard .env), .env)
@@ -42,6 +41,11 @@ permissions:
 	@sudo chown -fR root ${FOLDER}
 	@sudo chmod -fR 777 ${FOLDER}
 
+.PHONY: reset-permissions
+reset-permissions:
+	@sudo chown -R $$(whoami):$$(whoami) ${FOLDER}
+
+
 # Limpiar el entorno antes de instalar
 .PHONY: clean-environment
 clean-environment :
@@ -56,17 +60,20 @@ clean-environment :
 install-ci:
 	@rm -rf ${FOLDER}/package-lock.json
 	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
+	@$(MAKE) reset-permissions
 
 # Instalar dependencias
 .PHONY: install
 install: clean-environment permissions
 	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
 	@$(MAKE) permissions
+	@$(MAKE) reset-permissions
 
 # Build
 .PHONY: build
 build:
 	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD}'
+	@$(MAKE) reset-permissions
 
 # Build dev
 .PHONY: build-dev
