@@ -60,7 +60,7 @@ clean-environment :
 install-ci:
 	@rm -rf ${FOLDER}/package-lock.json
 	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
-	@$(MAKE) reset-permissions
+	#@$(MAKE) reset-permissions
 
 # Instalar dependencias
 .PHONY: install
