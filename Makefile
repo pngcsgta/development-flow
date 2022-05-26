@@ -48,6 +48,9 @@ root-permissions:
 user-permissions:
 	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_USER_PERMISSIONS}'
 
+.PHONY: reset-permissions
+reset-permissions:
+	@sudo chown -R $$(whoami):$$(whoami) ${FOLDER}
 
 # Limpiar el entorno antes de instalar
 .PHONY: clean-environment
