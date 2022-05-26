@@ -1,3 +1,4 @@
+MYNAME               := $(shell whoami)
 VERSION              := `node -pe "require('./package.json').version"`
 NAME                 := `node -pe "require('./package.json').name"`
 FOLDER               := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
@@ -10,6 +11,8 @@ CMD_TDD              := ${BOOTSTRAP}; npm run tdd
 CMD_TEST_UNIT        := ${BOOTSTRAP}; npm run test:unit
 CMD_TEST_INTEGRATION := ${BOOTSTRAP}; npm run test:integration
 CMD_TEST_FUNCTIONAL  := ${BOOTSTRAP}; npm run test:functional
+CMD_ROOT_PERMISSIONS := ${BOOTSTRAP}; ls -la; chown -R root:root .
+CMD_USER_PERMISSIONS := ${BOOTSTRAP}; useradd ${MYNAME}; chown -fR ${MYNAME}:${MYNAME} .
 IMAGE_REPO           := ngcs-dev-tools01.arsysdesarrollo.lan:5000
 IMAGE_VERSION        := latest
 IMAGE                := ${IMAGE_REPO}/gta-ci:${IMAGE_VERSION}
@@ -36,20 +39,19 @@ clean:
 ###################
 
 # Cambiar los permisos de todas las carpetas y ficheros
-.PHONY: permissions
-permissions:
-	@sudo chown -fR root ${FOLDER}
-	@sudo chmod -fR 777 ${FOLDER}
+.PHONY: root-permissions
+root-permissions:
+	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_ROOT_PERMISSIONS}'
 
-.PHONY: reset-permissions
-reset-permissions:
-	@sudo chown -R $$(whoami):$$(whoami) ${FOLDER}
+.PHONY: user-permissions
+user-permissions:
+	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_USER_PERMISSIONS}'
 
 
 # Limpiar el entorno antes de instalar
 .PHONY: clean-environment
 clean-environment :
-	@sudo rm -rf node_modules
+	rm -rf node_modules
 
 ##################
 ### Reglas NPM ###
@@ -58,33 +60,33 @@ clean-environment :
 # Instalar dependencias en integracion continua
 .PHONY: install-ci
 install-ci:
-	@rm -rf ${FOLDER}/package-lock.json
+	@$(MAKE) root-permissions
 	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
-	#@$(MAKE) reset-permissions
+	@$(MAKE) user-permissions
 
-# Instalar dependencias
+# Instalar dependencias (limpiando node_modules)
 .PHONY: install
-install: clean-environment permissions
-	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
-	@$(MAKE) permissions
-	@$(MAKE) reset-permissions
+install: clean-environment
+	@$(MAKE) install-ci
 
 # Build
 .PHONY: build
 build:
 	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD}'
-	@$(MAKE) reset-permissions
+	@$(MAKE) user-permissions
 
 # Build dev
 .PHONY: build-dev
 build-dev:
 	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD_DEV}'
+	@$(MAKE) user-permissions
 
 # Launch test
 .PHONY: test
 test: start-up
 	@docker exec container-${NAME_VARIABLE}-${VERSION_VARIABLE} /bin/bash -c '${CMD_TEST}'
 	@$(MAKE) destroy
+	@$(MAKE) user-permissions
 
 # Launch tdd
 .PHONY: tdd
