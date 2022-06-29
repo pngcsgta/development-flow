@@ -42,11 +42,11 @@ clean:
 # Cambiar los permisos de todas las carpetas y ficheros
 .PHONY: root-permissions
 root-permissions:
-	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_ROOT_PERMISSIONS}'
+	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_ROOT_PERMISSIONS}'
 
 .PHONY: user-permissions
 user-permissions:
-	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_USER_PERMISSIONS}'
+	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_USER_PERMISSIONS}'
 
 .PHONY: reset-permissions
 reset-permissions:
@@ -65,7 +65,7 @@ clean-environment :
 .PHONY: install-ci
 install-ci:
 	@$(MAKE) root-permissions
-	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
+	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
 	@$(MAKE) user-permissions
 
 # Instalar dependencias (limpiando node_modules)
@@ -76,13 +76,13 @@ install: clean-environment
 # Build
 .PHONY: build
 build:
-	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD}'
+	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD}'
 	@$(MAKE) user-permissions
 
 # Build dev
 .PHONY: build-dev
 build-dev:
-	@docker run --rm --name install-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD_DEV}'
+	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD_DEV}'
 	@$(MAKE) user-permissions
 
 # Launch test
