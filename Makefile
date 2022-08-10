@@ -73,16 +73,22 @@ install-ci:
 install: clean-environment
 	@$(MAKE) install-ci
 
+# @docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD}'
+# @$(MAKE) user-permissions
 # Build
 .PHONY: build
-build:
-	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD}'
+build: start-up
+	@docker exec container-${NAME_VARIABLE}-${VERSION_VARIABLE} /bin/bash -c '${CMD_BUILD}'
+	@$(MAKE) destroy
 	@$(MAKE) user-permissions
 
+# @docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD_DEV}'
+# @$(MAKE) user-permissions
 # Build dev
 .PHONY: build-dev
-build-dev:
-	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD_DEV}'
+build-dev: start-up
+	@docker exec container-${NAME_VARIABLE}-${VERSION_VARIABLE} /bin/bash -c '${CMD_BUILD_DEV}'
+	@$(MAKE) destroy
 	@$(MAKE) user-permissions
 
 # Launch test
