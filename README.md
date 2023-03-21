@@ -16,6 +16,8 @@ Steps:
 	+ **make install**: install repository dependencies
 	+ **make build**: launcha webpack to build the distribution files
 	+ **make build-dev**: launcha webpack to build the distribution files, for dev environment
+	+ **make lint**: Launch lint command
+	+ **make lint**: Launch lint-fix command
 	+ **make test**: Launch tests
 	+ **make tdd**: Launch tdd tests
 	+ **make test-unit**: Launch unit tests
