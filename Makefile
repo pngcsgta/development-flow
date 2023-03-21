@@ -3,6 +3,8 @@ VERSION              := `node -pe "require('./package.json').version"`
 NAME                 := `node -pe "require('./package.json').name"`
 FOLDER               := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 BOOTSTRAP            := sh /root/bootstrap.sh
+CMD_LINT             := ${BOOTSTRAP}; npm run lint
+CMD_LINTFIX          := ${BOOTSTRAP}; npm run lint-fix
 CMD_INSTALL          := ${BOOTSTRAP}; npm install --legacy-peer-deps
 CMD_BUILD            := ${BOOTSTRAP}; npm run build
 CMD_BUILD_DEV        := ${BOOTSTRAP}; npm run build:dev
@@ -60,6 +62,20 @@ clean-environment :
 ##################
 ### Reglas NPM ###
 ##################
+
+# Lanzar el lint
+.PHONY: lint
+lint:
+	# @$(MAKE) root-permissions
+	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_LINT}'
+	# @$(MAKE) user-permissions
+
+# Lanzar el lint-fix
+.PHONY: lint-fix
+lint-fix:
+	# @$(MAKE) root-permissions
+	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_LINTFIX}'
+	# @$(MAKE) user-permissions
 
 # Instalar dependencias en integracion continua
 .PHONY: install-ci
