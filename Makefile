@@ -94,6 +94,7 @@ install: clean-environment
 # Build
 .PHONY: build
 build: start-up
+	@$(MAKE) root-permissions
 	@docker exec container-${NAME_VARIABLE}-${VERSION_VARIABLE} /bin/bash -c '${CMD_BUILD}'
 	@$(MAKE) destroy
 	@$(MAKE) user-permissions
