@@ -2,10 +2,9 @@ MYNAME               := $(shell whoami)
 VERSION              := `node -pe "require('./package.json').version"`
 NAME                 := `node -pe "require('./package.json').name"`
 FOLDER               := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+PRJ_FOLDER           := /project
 BOOTSTRAP            := sh /root/bootstrap.sh
 CMD_LINT             := ${BOOTSTRAP}; npm run lint
-CMD_LINTFIX          := ${BOOTSTRAP}; npm run lint-fix
-CMD_INSTALL          := ${BOOTSTRAP}; npm install --legacy-peer-deps
 CMD_BUILD            := ${BOOTSTRAP}; npm run build
 CMD_BUILD_DEV        := ${BOOTSTRAP}; npm run build:dev
 CMD_TEST             := ${BOOTSTRAP}; npm run test
@@ -13,12 +12,9 @@ CMD_TDD              := ${BOOTSTRAP}; npm run tdd
 CMD_TEST_UNIT        := ${BOOTSTRAP}; npm run test:unit
 CMD_TEST_INTEGRATION := ${BOOTSTRAP}; npm run test:integration
 CMD_TEST_FUNCTIONAL  := ${BOOTSTRAP}; npm run test:functional
-CMD_ROOT_PERMISSIONS := ${BOOTSTRAP}; chown -R root:root .
-# CMD_USER_PERMISSIONS := ${BOOTSTRAP}; useradd ${MYNAME}; chown -fR ${MYNAME}:${MYNAME} .
-CMD_USER_PERMISSIONS := ${BOOTSTRAP}; chmod -R 777 .
-IMAGE_REPO           := ngcs-dev-tools01.arsysdesarrollo.lan:5000
+IMAGE_REPO           := reg.1u1.it/cph
 IMAGE_VERSION        := latest
-IMAGE                := ${IMAGE_REPO}/gta-ci:${IMAGE_VERSION}
+IMAGE                := ${IMAGE_REPO}/lynxes-rocky:${IMAGE_VERSION}
 
 .PHONY: check
 check:
@@ -32,7 +28,7 @@ endif
 
 .PHONY: boot
 boot:
-	@if [ ! -f .env ]; then echo "VERSION_VARIABLE=${VERSION}\nNAME_VARIABLE=${NAME}\nIMAGE=${IMAGE}" > .env; fi
+	@if [ ! -f .env ]; then echo "VERSION_VARIABLE=${VERSION}\nNAME_VARIABLE=${NAME}\nIMAGE=${IMAGE}\nPRJ_FOLDER=${PRJ_FOLDER}" > .env; fi
 
 clean:
 	@rm -rf .env
@@ -40,19 +36,6 @@ clean:
 ###################
 ### Reglas Misc ###
 ###################
-
-# Cambiar los permisos de todas las carpetas y ficheros
-.PHONY: root-permissions
-root-permissions:
-	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_ROOT_PERMISSIONS}'
-
-.PHONY: user-permissions
-user-permissions:
-	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_USER_PERMISSIONS}'
-
-.PHONY: reset-permissions
-reset-permissions:
-	@sudo chown -R $$(whoami):$$(whoami) ${FOLDER}
 
 # Limpiar el entorno antes de instalar
 .PHONY: clean-environment
@@ -66,54 +49,25 @@ clean-environment :
 # Lanzar el lint
 .PHONY: lint
 lint:
-	# @$(MAKE) root-permissions
-	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_LINT}'
-	# @$(MAKE) user-permissions
+	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:${PRJ_FOLDER} ${IMAGE} /bin/bash -c '${CMD_LINT}'
 
-# Lanzar el lint-fix
-.PHONY: lint-fix
-lint-fix:
-	# @$(MAKE) root-permissions
-	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_LINTFIX}'
-	# @$(MAKE) user-permissions
-
-# Instalar dependencias en integracion continua
-.PHONY: install-ci
-install-ci:
-	@$(MAKE) root-permissions
-	@docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_INSTALL}'
-	@$(MAKE) user-permissions
-
-# Instalar dependencias (limpiando node_modules)
-.PHONY: install
-install: clean-environment
-	@$(MAKE) install-ci
-
-# @docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD}'
-# @$(MAKE) user-permissions
 # Build
 .PHONY: build
 build: start-up
-	@$(MAKE) root-permissions
 	@docker exec container-${NAME_VARIABLE}-${VERSION_VARIABLE} /bin/bash -c '${CMD_BUILD}'
 	@$(MAKE) destroy
-	@$(MAKE) user-permissions
 
-# @docker run --rm --name general-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project ${IMAGE} /bin/bash -c '${CMD_BUILD_DEV}'
-# @$(MAKE) user-permissions
 # Build dev
 .PHONY: build-dev
 build-dev: start-up
 	@docker exec container-${NAME_VARIABLE}-${VERSION_VARIABLE} /bin/bash -c '${CMD_BUILD_DEV}'
 	@$(MAKE) destroy
-	@$(MAKE) user-permissions
 
 # Launch test
 .PHONY: test
 test: start-up
 	@docker exec container-${NAME_VARIABLE}-${VERSION_VARIABLE} /bin/bash -c '${CMD_TEST}'
 	@$(MAKE) destroy
-	@$(MAKE) user-permissions
 
 # Launch tdd
 .PHONY: tdd
@@ -146,7 +100,7 @@ test-functional: start-up
 # Contenedor interactivo
 .PHONY: interactive
 interactive:
-	@docker run --rm --name interactive-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:/root/project -i -t ${IMAGE} /bin/bash
+	@docker run --rm --name interactive-${NAME_VARIABLE}-${VERSION_VARIABLE} -v ${FOLDER}:${PRJ_FOLDER} -i -t ${IMAGE} /bin/bash
 
 # Construir el entorno
 .PHONY: start-up
