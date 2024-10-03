@@ -13,7 +13,7 @@ CMD_TEST_UNIT        := ${BOOTSTRAP}; npm run test:unit
 CMD_TEST_INTEGRATION := ${BOOTSTRAP}; npm run test:integration
 CMD_TEST_FUNCTIONAL  := ${BOOTSTRAP}; npm run test:functional
 IMAGE_REPO           := reg.1u1.it/cph
-IMAGE_VERSION        := latest
+#IMAGE_VERSION        := latest
 IMAGE                := ${IMAGE_REPO}/lynxes-rocky:${IMAGE_VERSION}
 
 .PHONY: check
